@@ -1,0 +1,60 @@
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./docker/local/django/Dockerfile
+    volumes:
+      - .:/app:z
+    expose:
+      - "8000"
+    env_file:
+      - ./.envs/.local/.django
+    command: /start
+    networks:
+      - direction-nw
+    depends_on:
+      - redis
+      - splash
+
+  nginx:
+    restart: always
+    depends_on:
+      - django
+    build:
+      context: ./docker/local/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      - direction-nw
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - direction-nw
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./docker/local/django/Dockerfile
+    command: /start-celeryworker
+    volumes:
+      - .:/app
+    env_file:
+      - ./.envs/.local/.django
+    depends_on:
+      - redis
+      - splash
+    networks:
+      - direction-nw
+
+  splash:
+    image: scrapinghub/splash
+    ports:
+      - 8050:8050
+    networks:
+      - direction-nw
+
+networks:
+  direction-nw:
+    driver: bridge

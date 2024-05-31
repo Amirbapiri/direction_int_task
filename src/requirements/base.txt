@@ -1,0 +1,10 @@
+django==4.2
+djangorestframework==3.14.0
+django-environ==0.10.0
+django-cors-headers==3.14.0
+celery==5.2.7
+redis==5.0.1
+django-redis==5.4.0
+scrapy
+scrapy-splash
+beautifulsoup4
